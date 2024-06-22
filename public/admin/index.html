@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../assets/admin/style.css">
+</head>
+
+<body>
+    <section id="container">
+        <input type="checkbox" id="navbtn">
+        <label for="navbtn" id="ic-lbl">
+            <i class="fa fa-bars tn-icon"></i>
+        </label>
+        <div id="nav">
+            <div id="nav-title">
+                <span><i class="fa fa-camera" aria-hidden="true"></i></span>
+                <h1>Mepa Store</h1>
+            </div>
+            <ul id="nav-ul">
+                <li>
+                    <a href="/admin">
+                        <span><i class="fa fa-tachometer" aria-hidden="true"></i></span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/product/">
+                        <span><i class="fa fa-product-hunt" aria-hidden="true"></i></span>
+                        <span>Product</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/user/">
+                        <span><i class="fa fa-list" aria-hidden="true"></i></span>
+                        <span>User&nbsp;list</span>
+                    </a>
+                </li>
+            </ul>
+            <div id="log-out">
+                <i class='bx bx-log-out'></i>
+                <button>Log&nbsp;out</button>
+            </div>
+        </div>
+        <div id="page">
+            <div id="top-nav">
+                <div id="tn-title">
+                    <i class="fa fa-bars tn-icon"></i>
+                    <h1>Dashboard</h1>
+                </div>
+            </div>
+            <div id="home-content">
+                <div id="box-list">
+                    <div class="box">
+                        <div>
+                            <h2>Total&nbsp;Order</h2>
+                            <h1 id="total-orders">Loading...</h1>
+                        </div>
+                        <div class="card-bx"><span class="card"><i class='bx bx-cart-alt'></i></span></div>
+                    </div>
+                    <div class="box">
+                        <div>
+                            <h2>Total&nbsp;Game</h2>
+                            <h1 id="total-games">Loading...</h1>
+                        </div>
+                        <div class="card-bx"><span class="card"><i class='bx bx-cart-alt'></i></span></div>
+                    </div>
+                    <div class="box">
+                        <div>
+                            <h2>Total&nbsp;User</h2>
+                            <h1 id="total-users">Loading...</h1>
+                        </div>
+                        <div class="card-bx"><span class="card"><i class='bx bx-cart-alt'></i></span></div>
+                    </div>
+                </div>
+                <div id="main-content">
+                    <div id="resent-sale">
+                        <div class="heading">Resent Sales</div>
+                        <table id="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Game</th>
+                                    <th>Total Diamond</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="top-sale">
+                        <div class="heading">Registered Games</div>
+                        <div id="top-sel-costomer">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </section>
+
+    <script>
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const stats = await response.json();
+                document.getElementById('total-orders').textContent = stats.totalOrders;
+                document.getElementById('total-games').textContent = stats.totalGames;
+                document.getElementById('total-users').textContent = stats.totalUsers;
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+                document.getElementById('total-orders').textContent = 'Error';
+                document.getElementById('total-games').textContent = 'Error';
+                document.getElementById('total-users').textContent = 'Error';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchStats);
+
+        async function fetchSales() {
+            try {
+                const response = await fetch('/api/sales');
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const sales = await response.json();
+                const salesTable = document.getElementById('sales-table').getElementsByTagName('tbody')[0];
+
+                sales.forEach(sale => {
+                    const row = salesTable.insertRow();
+                    row.insertCell(0).textContent = new Date(sale.date).toLocaleDateString();
+                    row.insertCell(1).textContent = sale.email;
+                    row.insertCell(2).textContent = sale.game;
+                    row.insertCell(3).textContent = `◆${parseFloat(sale.diamond).toLocaleString('en-IN')}`;
+                });
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchSales);
+
+        async function fetchGames() {
+            try {
+                const response = await fetch('/api/games');
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const games = await response.json();
+                const gamesContainer = document.getElementById('top-sel-costomer');
+
+                gamesContainer.innerHTML = '';
+
+                games.forEach(game => {
+                    const gameElement = document.createElement('div');
+                    gameElement.classList.add('t-s-c-list');
+
+                    gameElement.innerHTML = `
+                        <div class="split-section">
+                            <img src="../assets/img/${game.image_url}" alt="${game.game}">
+                            <span class="t-s-c-name">${game.game}</span>
+                        </div>
+                        <span class="t-s-c-price">◆${parseFloat(game.stock).toLocaleString('en-IN')}</span>
+                    `;
+
+                    gamesContainer.appendChild(gameElement);
+                });
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchGames);
+
+        document.getElementById('log-out').addEventListener('click', function (event) {
+            event.preventDefault();
+            fetch('/api/logout')
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    window.location.href = '/login';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+
+</html>

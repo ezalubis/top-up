@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="/assets/payment/style.css">
+
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="finishtitle"><span>Finish</span> Purchase!</div>
+        <div class="container">
+            <div class="heading">Choose Payment Method</div>
+            <div class="choose">
+                <div id="visa" class="visa active">
+                    <input id="visa_radio" name="choose" type="radio" value="BCA" hidden>
+                    <label for="visa_radio"><img src="../assets/img/bca.jpg" alt="BCA"></label>
+                </div>
+                <div id="maestro" class="maestro">
+                    <input id="maestro_radio" name="choose" type="radio" value="BNI" hidden>
+                    <label for="maestro_radio"><img src="../assets/img/bni.jpg" alt="BNI"></label>
+                </div>
+                <div id="paypal" class="paypal">
+                    <input id="paypal_radio" name="choose" type="radio" value="BRI" hidden>
+                    <label for="paypal_radio"><img src="../assets/img/bri.jpg" alt="BRI"></label>
+                </div>
+            </div>
+            <div class="game-title" id="gameTitle"></div> <!-- Elemen untuk menampilkan nama game -->
+            <form autocomplete="off" class="payform" id="paymentForm">
+                <input type="number" name="diamond" class="accname" placeholder="Enter The Diamond" required>
+                <input type="text" name="cardnumber" class="cardnumber" placeholder="Account Number" required>
+                <input type="text" name="idGame" class="cvv" placeholder="ID Game">
+                <input type="hidden" name="game" id="game"> <!-- Input tersembunyi untuk gameId -->
+                <input type="reset" class="reset" value="Cancel">
+                <input type="submit" class="submit" value="Submit">
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const paymentForm = document.getElementById('paymentForm');
+            const gameInput = document.getElementById('game');
+            const gameTitle = document.getElementById('gameTitle');
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameId = urlParams.get('gameId');
+
+            // Set nilai gameId ke input hidden
+
+            // Mengambil nama game berdasarkan gameId dari server
+            fetch(`/api/games/${gameId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        gameTitle.textContent = `Game: ${data[0].game}`; // Menampilkan nama game
+                        gameInput.value = data[0].game;
+                    } else {
+                        gameTitle.textContent = 'Game not found';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+            document.querySelectorAll('.choose div').forEach(function (div) {
+                div.addEventListener('click', function () {
+                    // Menonaktifkan kelas 'active' pada saudara
+                    document.querySelectorAll('.choose div').forEach(function (sibling) {
+                        sibling.classList.remove('active');
+                    });
+                    // Mengaktifkan kelas 'active' pada elemen yang diklik
+                    div.classList.add('active');
+                    // Mengatur input radio yang sesuai sebagai dipilih
+                    const radioInput = div.querySelector('input[type="radio"]');
+                    radioInput.checked = true;
+                    // Simpan nilai payment_method yang dipilih ke dalam variabel paymentMethod
+                    const paymentMethod = radioInput.value;
+                });
+            });
+
+
+            paymentForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const paymentMethod = document.querySelector('.choose .active input[type="radio"]').value;
+                const formData = new FormData(paymentForm);
+                const paymentData = {
+                    payment_method: paymentMethod,
+                    diamond: parseInt(formData.get('diamond')),
+                    card_number: formData.get('cardnumber'),
+                    id_game: formData.get('idGame'),
+                    game: formData.get('game')
+                };
+                console.log(paymentData);
+
+                // Lakukan panggilan API ke backend
+                await fetch('/api/transaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Transaction successful!');
+                            location.href = "/user";
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+            paymentForm.addEventListener('reset',async (e)=>{
+                e.preventDefault();
+                location.href = "/user";
+            })
+        });
+    </script>
+</body>
+
+</html>
