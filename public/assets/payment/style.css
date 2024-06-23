@@ -5,6 +5,16 @@
   padding: 0;
   box-sizing: border-box;
 }
+:root{
+  --white : #fff;
+  --black : #000;
+  --dark-blue : #2C2546;
+  --pink : #fa0758;
+  --grape : #8134AF;
+  --slate : #0f172a;
+  --slate-500 : #64748b;
+  --blue : #211166;
+}
 
 html {
   font-size: 10px;
@@ -17,8 +27,7 @@ html {
 .wrapper {
   font-family: "Open Sans", sans-serif;
   font-size: 3rem;
-
-  background-color: #efc88b;
+  background-image: linear-gradient(to right,var(--blue),var(--grape),var(--pink));
   height: 100vh;
 
   display: flex;
@@ -68,7 +77,6 @@ html {
   font-size: 3rem;
   text-transform: uppercase;
   letter-spacing: .5rem;
-  
   background: white;
 }
 

@@ -16,7 +16,7 @@
             <div class="left-header">
                 <a href="#"><img src="/assets/img/logo.png" alt="" width="100px"></a>
                 <div class="search">
-                    <input class="search-input" type="search" name="search" id="" placeholder="Search Here">
+                    <input class="search-input" type="search" name="search" id="searchInput" placeholder="Search Here">
                 </div>
             </div>
             <nav class="navbar">
@@ -77,7 +77,7 @@
                         </svg>
                         Game</a>
                 </li>
-                
+
                 <li class="active" id="li">
                     <a href="../history/index.html">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -94,7 +94,7 @@
 
     <section id="game" class="game">
         <div class="wrap">
-            <div class="game__grid" id="game-grid">asu</div>
+            <div class="game__grid" id="game-grid">Game</div>
         </div>
     </section>
 
@@ -195,16 +195,62 @@
 
     <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.querySelector('.search-input');
+            const gameGrid = document.getElementById('game-grid');
 
-        var ul = document.querySelector('#ul');
-        var li = document.querySelectorAll('#li');
+            function fetchGames(searchText = '') {
+                let url = '/api/games';
+                if (searchText) {
+                    url = `/api/games/search?q=${encodeURIComponent(searchText)}`;
+                }
 
-        li.forEach(el => {
-            el.addEventListener('click', function () {
-                ul.querySelector('.active').classList.remove('active');
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(games => {
+                        displayGames(games);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching games:', error);
+                        gameGrid.innerHTML = '<p>Error fetching games. Please try again later.</p>';
+                    });
+            }
 
-                el.classList.add('active');
+            function displayGames(games) {
+                gameGrid.innerHTML = '';
+                if (games.length === 0) {
+                    gameGrid.innerHTML = '<p>No games found</p>';
+                    return;
+                }
+
+                games.forEach(game => {
+                    const gameDiv = document.createElement('div');
+                    gameDiv.classList.add('game-item');
+                    gameDiv.innerHTML = `
+                <a href="/payment?gameId=${game.id}">
+                    <div class="game">
+                        <img src="/assets/img/${game.image_url}" alt="${game.game}">
+                        <div class="product-title">
+                            <p>${game.game} <br/> Stock Diamond (${game.stock})</p>
+                        </div>
+                    </div>
+                </a>
+            `;
+                    gameGrid.appendChild(gameDiv);
+                });
+            }
+
+            searchInput.addEventListener('input', function () {
+                const searchText = searchInput.value.trim();
+                fetchGames(searchText);
             });
+
+            fetchGames();
         });
 
         const swiper = new Swiper('.swiper', {
@@ -212,38 +258,12 @@
                 delay: 3000,
                 disableOnInteraction: false,
             },
-
             loop: true,
-
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
             },
         });
-        fetch('http://localhost:3000/api/games')
-            .then(response => response.json())
-            .then(games => {
-                const gameGrid = document.getElementById('game-grid');
-                gameGrid.innerHTML = '';
-                games.forEach(game => {
-                    const gameDiv = document.createElement('div');
-                    gameDiv.classList.add('game-item');
-
-                    gameDiv.innerHTML = `
-                    <a href="/payment?gameId=${game.id}">
-                        <div class="game">
-                            <img src="/assets/img/${game.image_url}" alt="${game.game}" width="250">
-                            <div class="product-title">
-                                <p>${game.game} <br/> Stock Diamond (${game.stock})</p>
-                            </div>
-                        </div>
-                    </a>
-                `;
-
-                    gameGrid.appendChild(gameDiv);
-                });
-            })
-            .catch(error => console.error('Error fetching games:', error));
 
         document.getElementById('logout-button').addEventListener('click', function (event) {
             event.preventDefault();
@@ -256,7 +276,6 @@
                 })
                 .catch(error => console.error('Error:', error));
         });
-
     </script>
 </body>
 

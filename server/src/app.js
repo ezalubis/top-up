@@ -194,10 +194,10 @@ app.get('/api/games', async (req, res) => {
   const results = await conn.query(`SELECT * FROM data_game`);
   res.send(results);
 });
-app.get('/api/games/:id', async (req, res) => {
-  const results = await conn.query(`SELECT * FROM data_game WHERE id=${req.params.id}`);
-  res.send(results);
-});
+// app.get('/api/games/:id', async (req, res) => {
+//   const results = await conn.query(`SELECT * FROM data_game WHERE id=${req.params.id}`);
+//   res.send(results);
+// });
 app.post('/api/games', upload.single('image_url'), async (req, res) => {
   await conn.query(`INSERT INTO data_game (game,stock,image_url) VALUES ('${req.body.game}','${req.body.stock}','${req.file.filename}')`);
   res.json("data berhasil ditambahkan");
@@ -291,21 +291,25 @@ app.post('/api/transaction', async (req, res) => {
     if (!email || !payment_method || !diamond || !card_number || !game || !id_game) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
+    console.log(game);
     // Cek stok diamond
-    const checkStockQuery =await conn.query(`SELECT stock FROM data_game WHERE game = '${game}'`);
+    const checkStockQuery = await conn.query(`SELECT stock FROM data_game WHERE game = '${game}'`);
     if (checkStockQuery === 0 || checkStockQuery < diamond) {
       return res.status(400).json({ success: false, message: 'Insufficient stock' });
     }
     // Validasi nomor kartu sesuai metode pembayaran
-    const cardPattern = {
-      BCA: /^4[0-9]{12}(?:[0-9]{3})?$/, // Visa
-      BNI: /^(5[1-5][0-9]{14})$/, // MasterCard
-      BRI: /^(3[47][0-9]{13})$/ // American Express
-    };
-
-    if (!cardPattern[payment_method].test(card_number)) {
-      return res.status(400).json({ success: false, message: 'Invalid card number' });
-    }
+    const rekeningPattern = {
+      BCA: /^[0-9]{10}$/,         // BCA: 10 digit
+      BNI: /^[0-9]{9,10}$/,        // BNI: 9-10 digit
+      BRI: /^[0-9]{10,15}$/        // BRI: 10-15 digit
+  };
+  
+  function validateRekening(paymentMethod, cardNumber) {
+      if (!rekeningPattern[paymentMethod].test(cardNumber)) {
+          return { success: false, message: 'Invalid account number' };
+      }
+      return { success: true, message: 'Valid account number' };
+  }
     // Simpan transaksi
     const insertQuery = await conn.query (`INSERT INTO data_transaction_user (email, game, payment_method, diamond, account_number,date,id_game)
                          VALUES ('${email}', '${game}', '${payment_method}', ${diamond}, '${card_number}',now(),${id_game})`);
@@ -367,6 +371,10 @@ app.get('/api/sales', async (req, res) => {
   }
 });
 
+app.get('/api/games/search',async (req, res) => {
+  const results = await conn.query(`SELECT * FROM data_game WHERE game LIKE '%${req.query.q}%'`);
+  res.send(results);
+});
 
 
 app.get("/api/logout",(req,res)=> {

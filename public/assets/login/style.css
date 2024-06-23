@@ -3,11 +3,22 @@
 *::after {
 	box-sizing: border-box;
 }
+:root{
+    --white : #fff;
+    --black : #000;
+    --dark-blue : #2C2546;
+    --pink : #fa0758;
+    --grape : #8134AF;
+    --slate : #0f172a;
+    --slate-500 : #64748b;
+    --blue : #211166;
+}
 
 body {
 	margin: 0;
 	font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
-	background: #3b4465;
+	/* background: #3b4465; */
+    background-image: linear-gradient(to right,var(--blue),var(--grape),var(--pink));
 }
 
 .forms-section {
@@ -273,13 +284,13 @@ body {
 
 .btn-login {
 	color: #fbfdff;
-	background: #a7e245;
+	background-image: linear-gradient(to right,var(--blue),var(--grape),var(--pink));
 	transform: translateX(-30%);
 }
 
 .btn-signup {
-	color: #a7e245;
-	background: #fbfdff;
+	background-image: linear-gradient(to right,var(--blue),var(--grape),var(--pink));
+	background-image: linear-gradient(to right,var(--blue),var(--grape),var(--pink));
 	box-shadow: inset 0 0 0 2px #a7e245;
 	transform: translateX(30%);
 }
