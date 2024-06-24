@@ -86,6 +86,77 @@
         form button {
             padding: 10px;
         }
+
+        .games-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .games-table th,
+        .games-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .games-table th {
+            background-color: #f2f2f2;
+        }
+
+        .games-table img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .games-table .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .games-table button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .games-table .edit {
+            background-color: #0b2559;
+            color: white;
+        }
+
+        .games-table .delete {
+            background-color: #0b2559;
+            color: white;
+        }
+
+        /* Responsif untuk layar kecil */
+        @media (max-width: 768px) {
+            .games-table img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* Gaya untuk heading */
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .heading button {
+            padding: 10px 15px;
+            background-color: #0b2559;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -234,25 +305,50 @@
                 const gamesContainer = document.getElementById('top-sel-costomer');
 
                 gamesContainer.innerHTML = '';
+
+                // Membuat tabel
+                const table = document.createElement('table');
+                table.classList.add('games-table');
+
+                // Membuat header tabel
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gamesTableBody">
+                    </tbody>
+                `;
+
+                // Menambahkan tabel ke container
+                gamesContainer.appendChild(table);
+
+                // Menambahkan baris ke tabel
+                const gamesTableBody = document.getElementById('gamesTableBody');
+
                 games.forEach(game => {
-                    const gameElement = document.createElement('div');
-                    gameElement.classList.add('t-s-c-list');
-                    gameElement.innerHTML = `
-                        <div class="split-section">
-                            <img src="../../assets/img/${game.image_url}" alt="${game.game}">
-                            <span class="t-s-c-name">${game.game}</span>
-                        </div>
-                        <span class="t-s-c-price">Stock: ${parseFloat(game.stock).toLocaleString('en-IN')}</span>
-                        <button onclick="editGame('${game.id}')">Edit</button>
-                        <button onclick="deleteGame('${game.id}')">Delete</button>
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td><img src="../../assets/img/${game.image_url}" alt="${game.game}"></td>
+                        <td>${game.game}</td>
+                        <td>${parseFloat(game.stock).toLocaleString('en-IN')}</td>
+                        <td class="actions">
+                            <button class="edit" onclick="editGame('${game.id}')">Edit</button>
+                            <button class="delete" onclick="deleteGame('${game.id}')">Delete</button>
+                        </td>
                     `;
-                    gamesContainer.appendChild(gameElement);
+
+                    gamesTableBody.appendChild(row);
                 });
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             }
         }
-
         document.getElementById('add-game-form').addEventListener('submit', async function (event) {
             event.preventDefault();
             const formData = new FormData(this);
@@ -296,6 +392,7 @@
         async function editGame(gameId) {
             try {
                 const response = await fetch(`/api/games/${gameId}`);
+                console.log(response);
                 if (!response.ok) throw new Error('Network response was not ok');
 
                 const game = await response.json();
@@ -305,6 +402,7 @@
                 console.log(document.getElementById('edit-game-id').value);
                 showModal('edit-game-modal');
             } catch (error) {
+                console.log(error);
                 console.error('There was a problem with the fetch operation:', error);
             }
         }
@@ -331,7 +429,7 @@
 
             if (modalId === 'add-game-modal') {
                 document.getElementById('add-game-form').reset();
-            }else if(modalId === 'edit-game-modal'){
+            } else if (modalId === 'edit-game-modal') {
                 document.getElementById('edit-game-form').reset();
             }
         }

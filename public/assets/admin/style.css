@@ -279,25 +279,8 @@ td{
   box-shadow:5px 10px 10px 2px #e3e3e3;
   border-radius:10px;
 }
-.t-s-c-list{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:5px;
-}
-.t-s-c-list img{
-  width:80px;
-  height:80px;
-  object-fit:cover;
-  border-radius:10px;
-}
-.split-section{
-  display:flex;
-  align-items:center;
-}
-.t-s-c-name{
-  margin-left:8px;
-}
+
+
 
 
 /* responsive */
