@@ -279,6 +279,56 @@ td{
   box-shadow:5px 10px 10px 2px #e3e3e3;
   border-radius:10px;
 }
+#top-sel-costomer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 5px 10px 10px 2px #e3e3e3;
+}
+
+#top-sel-costomer .t-s-c-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#top-sel-costomer .t-s-c-list:hover {
+  background-color: #f1f1f1;
+}
+
+#top-sel-costomer .split-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#top-sel-costomer .split-section img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+#top-sel-costomer .t-s-c-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+#top-sel-costomer .t-s-c-price {
+  font-weight: 500;
+  font-size: 14px;
+  color: #888;
+}
 
 
 
