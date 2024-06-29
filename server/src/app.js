@@ -194,10 +194,10 @@ app.get('/api/games', async (req, res) => {
   const results = await conn.query(`SELECT * FROM data_game`);
   res.send(results);
 });
-// app.get('/api/games/:id', async (req, res) => {
-//   const results = await conn.query(`SELECT * FROM data_game WHERE id=${req.params.id}`);
-//   res.send(results);
-// });
+app.get('/api/game/:id', async (req, res) => {
+  const results = await conn.query(`SELECT * FROM data_game WHERE id=${req.params.id}`);
+  res.send(results);
+});
 app.post('/api/games', upload.single('image_url'), async (req, res) => {
   await conn.query(`INSERT INTO data_game (game,stock,image_url) VALUES ('${req.body.game}','${req.body.stock}','${req.file.filename}')`);
   res.json("data berhasil ditambahkan");
@@ -291,7 +291,6 @@ app.post('/api/transaction', async (req, res) => {
     if (!email || !payment_method || !diamond || !card_number || !game || !id_game) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
-    console.log(game);
     // Cek stok diamond
     const checkStockQuery = await conn.query(`SELECT stock FROM data_game WHERE game = '${game}'`);
     if (checkStockQuery === 0 || checkStockQuery < diamond) {

@@ -51,7 +51,7 @@
             // Set nilai gameId ke input hidden
 
             // Mengambil nama game berdasarkan gameId dari server
-            fetch(`/api/games/${gameId}`)
+            fetch(`/api/game/${gameId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.length > 0) {
