@@ -194,10 +194,10 @@ app.get('/api/games', async (req, res) => {
   const results = await conn.query(`SELECT * FROM data_game`);
   res.send(results);
 });
-app.get('/api/games/:id', async (req, res) => {
-  const results = await conn.query(`SELECT * FROM data_game WHERE id=${req.params.id}`);
-  res.send(results);
-});
+// app.get('/api/games/:id', async (req, res) => {
+//   const results = await conn.query(`SELECT * FROM data_game WHERE id=${req.params.id}`);
+//   res.send(results);
+// });
 app.post('/api/games', upload.single('image_url'), async (req, res) => {
   await conn.query(`INSERT INTO data_game (game,stock,image_url) VALUES ('${req.body.game}','${req.body.stock}','${req.file.filename}')`);
   res.json("data berhasil ditambahkan");
