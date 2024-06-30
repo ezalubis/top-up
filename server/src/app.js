@@ -163,10 +163,10 @@ app.put('/api/user/:id', async (req, res) => {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(req.body.password, salt);
     const { id } = req.params;
-    const { username} = req.body; // Destructure the data from request body
+    const { username,email} = req.body; // Destructure the data from request body
 
-    const results = await conn.query(`UPDATE authentication SET username=?, password=?, type_account=? WHERE id=? AND type_account='user'`,
-      [username, hash, "user", id]);
+    const results = await conn.query(`UPDATE authentication SET username=?, email=?, password=?, type_account=? WHERE id=? AND type_account='user'`,
+      [username,email, hash, "user", id]);
 
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'User not found or no changes made' });
