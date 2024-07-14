@@ -91,8 +91,6 @@
                     id_game: formData.get('idGame'),
                     game: formData.get('game')
                 };
-                console.log(paymentData);
-
                 // Lakukan panggilan API ke backend
                 await fetch('/api/transaction', {
                     method: 'POST',
@@ -104,7 +102,10 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            alert('Transaction successful!');
+                            if(paymentData.diamond > 200){
+                                alert(`Transaction successful! With discount 10%`);
+                            }
+                            alert(`Transaction successful!`);
                             location.href = "/user";
                         } else {
                             alert(data.message);

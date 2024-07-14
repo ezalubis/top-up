@@ -191,7 +191,7 @@ app.delete('/api/user/:id', async (req, res) => {
   }
 });
 app.get('/api/games', async (req, res) => {
-  const results = await conn.query(`SELECT * FROM data_game`);
+  const results = await conn.query(`SELECT * FROM data_game WHERE stock>0`);
   res.send(results);
 });
 app.get('/api/game/:id', async (req, res) => {
@@ -293,8 +293,8 @@ app.post('/api/transaction', async (req, res) => {
     }
     // Cek stok diamond
     const checkStockQuery = await conn.query(`SELECT stock FROM data_game WHERE game = '${game}'`);
-    if (checkStockQuery === 0 || checkStockQuery < diamond) {
-      return res.status(400).json({ success: false, message: 'Insufficient stock' });
+    if (checkStockQuery[0].stock === 0 || checkStockQuery[0].stock < diamond) {
+      return res.status(400).json({ success: false, message: `Insufficient stock, Stock Now = ${checkStockQuery[0].stock} ` });
     }
     // Validasi nomor kartu sesuai metode pembayaran
     const rekeningPattern = {
