@@ -4,10 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment</title>
+    <title>Payment Receipt</title>
     <link rel="stylesheet" href="/assets/payment/style.css">
-
-    </style>
 </head>
 
 <body>
@@ -29,33 +27,46 @@
                     <label for="paypal_radio"><img src="../assets/img/bri.jpg" alt="BRI"></label>
                 </div>
             </div>
-            <div class="game-title" id="gameTitle"></div> <!-- Elemen untuk menampilkan nama game -->
+            <div class="game-title" id="gameTitle"></div>
             <form autocomplete="off" class="payform" id="paymentForm">
                 <input type="number" name="diamond" class="accname" placeholder="Enter The Diamond" required>
                 <input type="text" name="cardnumber" class="cardnumber" placeholder="Account Number" required>
                 <input type="text" name="idGame" class="cvv" placeholder="ID Game">
-                <input type="hidden" name="game" id="game"> <!-- Input tersembunyi untuk gameId -->
+                <input type="hidden" name="game" id="game">
                 <input type="reset" class="reset" value="Cancel">
                 <input type="submit" class="submit" value="Submit">
             </form>
         </div>
+        <div class="receipt-form" id="receiptForm">
+            <h2>Payment Receipt</h2>
+            <p><strong>Date:</strong> <span id="receiptDate"></span></p>
+            <p><strong>Time:</strong> <span id="receiptTime"></span></p>
+            <p><strong>Game:</strong> <span id="receiptGame"></span></p>
+            <p><strong>Payment Method:</strong> <span id="receiptPaymentMethod"></span></p>
+            <p><strong>Diamonds Purchased:</strong> <span id="receiptDiamonds"></span></p>
+            <p><strong>Total Price:</strong> <span id="receiptTotalPrice"></span></p>
+            <button onclick="window.print()">Print Receipt</button>
+            <button onclick="window.location.href='/user'">Back to Home</button>
+
+        </div>
     </div>
     <script>
+        function formatRupiah(amount) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
+}
         document.addEventListener('DOMContentLoaded', function () {
             const paymentForm = document.getElementById('paymentForm');
             const gameInput = document.getElementById('game');
             const gameTitle = document.getElementById('gameTitle');
+            const receiptForm = document.getElementById('receiptForm');
             const urlParams = new URLSearchParams(window.location.search);
             const gameId = urlParams.get('gameId');
 
-            // Set nilai gameId ke input hidden
-
-            // Mengambil nama game berdasarkan gameId dari server
             fetch(`/api/game/${gameId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.length > 0) {
-                        gameTitle.textContent = `Game: ${data[0].game}`; // Menampilkan nama game
+                        gameTitle.textContent = `Game: ${data[0].game}`;
                         gameInput.value = data[0].game;
                     } else {
                         gameTitle.textContent = 'Game not found';
@@ -65,20 +76,14 @@
 
             document.querySelectorAll('.choose div').forEach(function (div) {
                 div.addEventListener('click', function () {
-                    // Menonaktifkan kelas 'active' pada saudara
                     document.querySelectorAll('.choose div').forEach(function (sibling) {
                         sibling.classList.remove('active');
                     });
-                    // Mengaktifkan kelas 'active' pada elemen yang diklik
                     div.classList.add('active');
-                    // Mengatur input radio yang sesuai sebagai dipilih
                     const radioInput = div.querySelector('input[type="radio"]');
                     radioInput.checked = true;
-                    // Simpan nilai payment_method yang dipilih ke dalam variabel paymentMethod
-                    const paymentMethod = radioInput.value;
                 });
             });
-
 
             paymentForm.addEventListener('submit', async function (event) {
                 event.preventDefault();
@@ -91,7 +96,7 @@
                     id_game: formData.get('idGame'),
                     game: formData.get('game')
                 };
-                // Lakukan panggilan API ke backend
+
                 await fetch('/api/transaction', {
                     method: 'POST',
                     headers: {
@@ -102,18 +107,33 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            if(paymentData.diamond > 200){
-                                alert(`Transaction successful! With discount 10%`);
+                            let totalHarga = paymentData.diamond * 1000;
+                            if (totalHarga > 50000) {
+                                totalHarga *= 0.9; // diskon 10%
                             }
-                            alert(`Transaction successful!`);
-                            location.href = "/user";
+                            const totalHargaFormatted = formatRupiah(totalHarga);
+                            const now = new Date();
+                            const formattedDate = now.toLocaleDateString('id-ID', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                            const formattedTime = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            document.getElementById('receiptDate').textContent = formattedDate;
+                            document.getElementById('receiptTime').textContent = formattedTime;
+                            document.getElementById('receiptGame').textContent = paymentData.game;
+                            document.getElementById('receiptPaymentMethod').textContent = paymentData.payment_method;
+                            document.getElementById('receiptDiamonds').textContent = paymentData.diamond;
+                            document.getElementById('receiptTotalPrice').textContent = paymentData.diamond > 50000 ? `${totalHargaFormatted} (Discounted Price 10%)` : `${totalHargaFormatted} (Regular Price)`;                            receiptForm.style.display = 'block';
                         } else {
                             alert(data.message);
                         }
                     })
                     .catch(error => console.error('Error:', error));
             });
-            paymentForm.addEventListener('reset',async (e)=>{
+
+            paymentForm.addEventListener('reset', async (e) => {
                 e.preventDefault();
                 location.href = "/user";
             })

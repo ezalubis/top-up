@@ -5,39 +5,38 @@
   padding: 0;
   box-sizing: border-box;
 }
-:root{
-  --white : #fff;
-  --black : #000;
-  --dark-blue : #2C2546;
-  --pink : #fa0758;
-  --grape : #8134AF;
-  --slate : #0f172a;
-  --slate-500 : #64748b;
-  --blue : #211166;
+
+:root {
+  --white: #fff;
+  --black: #000;
+  --dark-blue: #2c2546;
+  --pink: #fa0758;
+  --grape: #8134af;
+  --slate: #0f172a;
+  --slate-500: #64748b;
+  --blue: #211166;
 }
 
 html {
   font-size: 10px;
 }
 
- #gameTitle{
+#gameTitle {
   display: none !important;
-  color: #CF5C36;
+  color: #cf5c36;
 }
+
 .wrapper {
   font-family: "Open Sans", sans-serif;
   font-size: 3rem;
-  background-image: linear-gradient(to right,var(--blue),var(--grape),var(--pink));
+  background-image: linear-gradient(to right, var(--blue), var(--grape), var(--pink));
   height: 100vh;
-
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-
   overflow: hidden;
 }
-
 
 .finishtitle {
   position: absolute;
@@ -46,7 +45,6 @@ html {
   transform: translateX(-50%);
   letter-spacing: 2px;
   word-spacing: -5px;
-  
 }
 
 .finishtitle span {
@@ -61,7 +59,7 @@ html {
   background-color: #eee5e9;
   border-radius: 5%;
   position: relative;
-  border: 1px solid #7C7C7C;
+  border: 1px solid #7c7c7c;
   box-shadow: 10px 10px 10px black;
   margin-top: 10rem;
 }
@@ -70,18 +68,18 @@ html {
   position: absolute;
   top: 10%;
   left: 50%;
-  transform: translate(-50%,-0);  
+  transform: translate(-50%, -0);
   width: 100%;
   text-align: center;
   font-weight: bold;
   font-size: 3rem;
   text-transform: uppercase;
-  letter-spacing: .5rem;
+  letter-spacing: 0.5rem;
   background: white;
 }
 
 .heading::after {
-  content: '';
+  content: "";
   background: black;
   border-bottom: 1px solid black;
   position: absolute;
@@ -93,13 +91,10 @@ html {
 
 .choose {
   margin-top: 11rem;
-  
   display: flex;
   justify-content: space-around;
   align-items: center;
-  
 }
-
 
 .choose div {
   width: 22%;
@@ -107,9 +102,9 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: .3;
+  opacity: 0.3;
   transition: 500ms;
-  transform: scale(.8);
+  transform: scale(0.8);
   padding-bottom: 4px;
   cursor: pointer;
 }
@@ -123,7 +118,6 @@ html {
   width: 50%;
   height: 100%;
 }
-
 
 .choose img {
   width: 100%;
@@ -145,11 +139,11 @@ html {
 
 .payform {
   display: grid;
-  grid-template-columns: 1fr  repeat(2, 20%) 1fr;
+  grid-template-columns: 1fr repeat(2, 20%) 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr;
   margin-top: 2rem;
   grid-row-gap: 1rem;
-  grid-column-gap: .8rem;
+  grid-column-gap: 0.8rem;
 }
 
 .payform input {
@@ -165,6 +159,7 @@ html {
   grid-column: 2/4;
   grid-row: 1/2;
 }
+
 .cardnumber {
   grid-column: 2/4;
   grid-row: 2/3;
@@ -185,7 +180,7 @@ html {
 }
 
 .reset:hover {
-  background: #FCF2F6 !important;
+  background: #fcf2f6 !important;
   transition: 200ms;
 }
 
@@ -197,13 +192,55 @@ html {
   font-weight: bold;
   cursor: pointer;
   border: 1px solid #000000 !important;
-  background: #CF5C36 !important;
+  background: #cf5c36 !important;
   transition: 500ms;
   font-size: 1.3rem !important;
 }
 
 .submit:hover {
-  background: #FF8A63 !important;
+  background: #ff8a63 !important;
   transition: 200ms;
 }
 
+/* Receipt Form Styles */
+.receipt-form {
+  display: none;
+  text-align: center;
+  margin-top: 2rem;
+  background-color: #fff;
+  border: 1px solid #7c7c7c;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  position: absolute;
+}
+
+.receipt-form h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--dark-blue);
+}
+
+.receipt-form p {
+  font-size: 1.8rem;
+  margin: 0.5rem 0;
+  color: var(--slate-500);
+}
+
+.receipt-form button {
+  background-color: var(--pink);
+  color: var(--white);
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.receipt-form button:hover {
+  background-color: var(--grape);
+}

@@ -284,42 +284,56 @@ app.get('/payment', async(req, res) => {
 
 app.post('/api/transaction', async (req, res) => {
   try {
-    const { payment_method, diamond, card_number, game,id_game } = req.body;
+    const { payment_method, diamond, card_number, game, id_game } = req.body;
     const { email } = req.me;
 
     // Pastikan semua data yang diperlukan tersedia
     if (!email || !payment_method || !diamond || !card_number || !game || !id_game) {
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
+      return res.status(400).json({ success: false, message: 'Data yang diperlukan tidak lengkap' });
     }
+
     // Cek stok diamond
     const checkStockQuery = await conn.query(`SELECT stock FROM data_game WHERE game = '${game}'`);
     if (checkStockQuery[0].stock === 0 || checkStockQuery[0].stock < diamond) {
-      return res.status(400).json({ success: false, message: `Insufficient stock, Stock Now = ${checkStockQuery[0].stock} ` });
+      return res.status(400).json({ success: false, message: 'Stok tidak mencukupi' });
     }
+
     // Validasi nomor kartu sesuai metode pembayaran
     const rekeningPattern = {
       BCA: /^[0-9]{10}$/,         // BCA: 10 digit
-      BNI: /^[0-9]{9,10}$/,        // BNI: 9-10 digit
-      BRI: /^[0-9]{10,15}$/        // BRI: 10-15 digit
-  };
-  
-  function validateRekening(paymentMethod, cardNumber) {
+      BNI: /^[0-9]{9,10}$/,       // BNI: 9-10 digit
+      BRI: /^[0-9]{10,15}$/       // BRI: 10-15 digit
+    };
+
+    function validateRekening(paymentMethod, cardNumber) {
       if (!rekeningPattern[paymentMethod].test(cardNumber)) {
-          return { success: false, message: 'Invalid account number' };
+        return { success: false, message: 'Nomor rekening tidak valid' };
       }
-      return { success: true, message: 'Valid account number' };
-  }
+      return { success: true, message: 'Nomor rekening valid' };
+    }
+
+    // Hitung total harga diamond (misalnya 1 diamond = 1.000)
+    let totalHarga = diamond * 1000;
+
+    // Terapkan diskon jika pembelian di atas 50.000
+    if (totalHarga > 50000) {
+      totalHarga *= 0.9; // diskon 10%
+    }
+
     // Simpan transaksi
-    const insertQuery = await conn.query (`INSERT INTO data_transaction_user (email, game, payment_method, diamond, account_number,date,id_game)
-                         VALUES ('${email}', '${game}', '${payment_method}', ${diamond}, '${card_number}',now(),${id_game})`);
+    const insertQuery = await conn.query(`INSERT INTO data_transaction_user (email, game, payment_method, diamond, account_number, price, date, id_game)
+                         VALUES ('${email}', '${game}', '${payment_method}', ${diamond}, '${card_number}', ${totalHarga}, now(), ${id_game})`);
+
     // Update stok diamond
-    const updateStockQuery =await conn.query(`UPDATE data_game SET stock = stock - ${diamond} WHERE game = '${game}' `);
-    res.status(200).json({ success: true, message: 'Transaction successful' });
+    const updateStockQuery = await conn.query(`UPDATE data_game SET stock = stock - ${diamond} WHERE game = '${game}'`);
+
+    res.status(200).json({ success: true, message: 'Transaksi berhasil' });
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ success: false, message: 'Database error' });
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan pada database' });
   }
 });
+
 
 app.get('/api/history', async (req,res)=>{
   try {
